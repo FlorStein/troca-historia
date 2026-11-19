@@ -305,7 +305,7 @@ function travelToTime(target) {
 function stepFilm(direction) {
   manualPlayback = true;
   film.pause();
-  const current = filmChapter();
+  const current = flightDestination ?? filmChapter();
   const next = Math.max(0, Math.min(chapters.length - 1, current + direction));
   const times = chapterTimes();
   const hold = Math.min(times[next] + .68, film.duration - .06);
