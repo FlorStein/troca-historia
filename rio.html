@@ -15,7 +15,8 @@ body { margin: 0; background: #18334b; color: #fff8ef; font: 16px/1.55 'DM Sans'
 .city { object-position: 62% top; }
 .clouds { background: #527891; }
 .desktop-film { display: none; }
-.film-mode .desktop-film { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.film-mode .desktop-film { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #10273b; }
+.film-mode .chapter:first-child .copy { left: 50%; bottom: auto; top: 50%; transform: translate(-50%,-50%); text-align: center; border: 0; }
 .film-mode .clouds, .film-mode #rio, .film-mode #beach, .film-mode .air, .film-mode .room { display: none; }
 .air { position: absolute; inset: 0; overflow: hidden; pointer-events: none; perspective: 46rem; }
 .air i { position: absolute; inset: -18%; opacity: 0; background: radial-gradient(ellipse at 14% 68%,#e4eff7c9,transparent 38%),radial-gradient(ellipse at 93% 27%,#f8ece1dd,transparent 37%); }
@@ -54,14 +55,14 @@ button, .button { background: #faeee5; color: #18334b; padding: .6rem 1rem; bord
     <img class="shot" id="beach" alt="" src="https://commons.wikimedia.org/wiki/Special:FilePath/Praia_de_Ipanema_vista_do_Arpoador.jpg?width=1600">
     <div class="air" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="room" id="room" aria-hidden="true"></div>
-    <video class="desktop-film" id="desktop-film" data-src="vuelo-troca.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
+    <video class="desktop-film" id="desktop-film" data-src="vuelo-troca-hd.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
     <div class="scrim" aria-hidden="true"></div>
     <header class="head"><a href="index.html">Troca</a><button type="button" id="lang" aria-label="Português">PT</button></header>
   </div>
   <div class="chapters">
     <section class="chapter"><div class="copy">
       <small data-pt="Buenos Aires · Argentina">Buenos Aires · Argentina</small>
-      <h1 data-pt="De uma casa a outra.">De una casa a otra.</h1>
+      <h1 data-pt="Conheça a Troca.">Conocé Troca.</h1>
       <p data-pt="A Troca nasceu de uma pergunta: e se hospedar alguém na sua casa ajudasse você a conhecer outra cidade? Role para começar a viagem.">Troca nació de una pregunta: ¿y si alojar a alguien en tu casa te ayudara a conocer otra ciudad? Deslizá para empezar el viaje.</p>
     </div></section>
     <section class="chapter"><div class="copy">
@@ -108,10 +109,15 @@ let frame = 0;
 let flying = false;
 let filmProgress = 0;
 let filmLoaded = false;
+let intro = 'pending';
+const introEnd = 1;
+let wheelAt = -Infinity;
+let lastStep = -Infinity;
+let destination = null;
 
 function seekFilm() {
-  if (!desktop.matches || reduced.matches || film.seeking || !Number.isFinite(film.duration)) return;
-  const target = filmProgress * Math.max(0, film.duration - .04);
+  if (!desktop.matches || reduced.matches || intro !== 'done' || film.seeking || !Number.isFinite(film.duration)) return;
+  const target = introEnd + filmProgress * Math.max(0, film.duration - introEnd - .05);
   if (Math.abs(film.currentTime - target) > .015) film.currentTime = target;
 }
 
@@ -123,13 +129,21 @@ function render() {
   const useFilm = desktop.matches && immersive;
   if (useFilm && !film.hasAttribute('src')) film.src = film.dataset.src;
   document.documentElement.classList.toggle('film-mode', useFilm && filmLoaded && !film.error);
-  filmProgress = clamp(-stops[0] / Math.max(1, document.documentElement.scrollHeight - innerHeight));
+  const filmMode = useFilm && filmLoaded && !film.error;
+  filmProgress = clamp(-stops[0] / Math.max(1, stops.at(-1) - stops[0]));
   seekFilm();
   document.documentElement.classList.toggle('enhanced', immersive);
   const active = Math.max(0, stops.findLastIndex(top => top <= 1));
   captions.forEach((caption, index) => {
-    caption.hidden = immersive && (index !== active || (active < 5 && segment(active) > .82));
+    if (filmMode) {
+      const settled = Math.abs(stops[active]) < 28 || (active < chapters.length - 1 && segment(active) < .65);
+      caption.hidden = intro !== 'done' || index !== active ||
+        (destination !== null ? Math.abs(stops[destination]) > 28 || active !== destination : !settled);
+    } else {
+      caption.hidden = immersive && (index !== active || (active < 5 && segment(active) > .82));
+    }
   });
+  if (destination !== null && Math.abs(stops[destination]) <= 1) destination = null;
   const takeoff = ease((segment(0) - .62) / .38);
   const descent = ease((segment(2) - .65) / .35);
   const coast = ease((segment(3) - .62) / .38);
@@ -169,7 +183,45 @@ desktop.addEventListener('change', schedule);
 film.addEventListener('loadeddata', () => {
   filmLoaded = true;
   schedule();
+  if (intro !== 'pending') return;
+  if (scrollY > 2 || !desktop.matches || reduced.matches) {
+    finishIntro();
+    return;
+  }
+  intro = 'playing';
+  film.play().then(() => requestAnimationFrame(watchIntro)).catch(finishIntro);
 });
+function finishIntro() {
+  film.pause();
+  intro = 'done';
+  seekFilm();
+  schedule();
+}
+function watchIntro() {
+  if (film.currentTime >= introEnd || !desktop.matches || reduced.matches || scrollY > 2) finishIntro();
+  else requestAnimationFrame(watchIntro);
+}
+addEventListener('wheel', event => {
+  if (!desktop.matches || reduced.matches || !filmLoaded || film.error ||
+      event.ctrlKey || !event.deltaY || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
+  const panel = event.target.closest?.('.copy');
+  if (panel && (event.deltaY > 0
+    ? panel.scrollTop + panel.clientHeight < panel.scrollHeight - 1
+    : panel.scrollTop > 1)) return;
+  event.preventDefault();
+  const now = performance.now();
+  const fresh = now - wheelAt > 160;
+  wheelAt = now;
+  if (!fresh || now - lastStep < 480 || intro !== 'done') return;
+  const current = destination ?? chapters.reduce((nearest, chapter, index) =>
+    Math.abs(chapter.getBoundingClientRect().top) < Math.abs(chapters[nearest].getBoundingClientRect().top)
+      ? index : nearest, 0);
+  const next = Math.max(0, Math.min(chapters.length - 1, current + Math.sign(event.deltaY)));
+  if (next === current) return;
+  lastStep = now;
+  destination = next;
+  chapters[next].scrollIntoView({ behavior: 'smooth', block: 'start' });
+}, { passive: false });
 film.addEventListener('seeked', seekFilm);
 film.addEventListener('error', schedule);
 const language = document.getElementById('lang');
