@@ -16,9 +16,17 @@ body { margin: 0; background: #18334b; color: #fff8ef; font: 16px/1.55 'DM Sans'
 .clouds { background: #527891; }
 .desktop-film { display: none; }
 .film-mode .desktop-film { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #10273b; }
-.film-mode .chapter:first-child .copy { left: 50%; bottom: auto; top: 50%; transform: translate(-50%,-50%); text-align: center; border: 0; }
+.film-mode .chapter:first-child .copy { left: 50%; bottom: auto; top: 50%; transform: translate(-50%,-50%); text-align: center; border: 0; background: transparent; color: #18334b; pointer-events: none; animation: welcome-in 1.45s ease-out both; }
+.film-mode .chapter:first-child .copy h1 { font-size: clamp(3rem,7vw,7rem); text-shadow: 0 1px 12px #fff8efcc, 0 0 38px #fff8ef99; }
+.film-mode .chapter:first-child .copy :is(small,p) { display: none; }
+@keyframes welcome-in {
+  from { opacity: 0; translate: 0 .65rem; }
+  to { opacity: 1; translate: 0; }
+}
 .scroll-cue { display: none; }
 .film-mode .scroll-cue:not([hidden]) { position: absolute; z-index: 2; right: clamp(1rem,4vw,4rem); bottom: 2rem; display: flex; align-items: center; gap: .7rem; padding: .65rem 1rem; border-radius: 999px; background: #10273be8; color: #fff8ef; }
+.film-mode .scroll-cue.is-welcome { animation: welcome-in 1s .55s ease-out both; }
+.film-mode .stage.is-welcome .scrim { opacity: .35; transition: opacity 1.2s ease; }
 .film-mode .clouds, .film-mode #rio, .film-mode #beach, .film-mode .air, .film-mode .room { display: none; }
 .air { position: absolute; inset: 0; overflow: hidden; pointer-events: none; perspective: 46rem; }
 .air i { position: absolute; inset: -18%; opacity: 0; background: radial-gradient(ellipse at 14% 68%,#e4eff7c9,transparent 38%),radial-gradient(ellipse at 93% 27%,#f8ece1dd,transparent 37%); }
@@ -107,6 +115,7 @@ const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const desktop = matchMedia('(min-width: 900px) and (pointer: fine)');
 const film = document.getElementById('desktop-film');
 const scrollCue = document.getElementById('scroll-cue');
+const stage = document.querySelector('.stage');
 const clamp = value => Math.min(1, Math.max(0, value));
 const ease = value => { const t = clamp(value); return t * t * (3 - 2 * t); };
 let frame = 0;
@@ -115,13 +124,16 @@ let filmProgress = 0;
 let filmLoaded = false;
 let intro = 'pending';
 const introEnd = 1;
+const driftEnd = 1.65;
+let driftPlaying = false;
+let scrollStartTime = introEnd;
 let wheelAt = -Infinity;
 let lastStep = -Infinity;
 let destination = null;
 
 function seekFilm() {
-  if (!desktop.matches || reduced.matches || intro !== 'done' || film.seeking || !Number.isFinite(film.duration)) return;
-  const target = introEnd + filmProgress * Math.max(0, film.duration - introEnd - .05);
+  if (!desktop.matches || reduced.matches || intro !== 'done' || driftPlaying || film.seeking || !Number.isFinite(film.duration)) return;
+  const target = scrollStartTime + filmProgress * Math.max(0, film.duration - scrollStartTime - .05);
   if (Math.abs(film.currentTime - target) > .015) film.currentTime = target;
 }
 
@@ -138,6 +150,10 @@ function render() {
   seekFilm();
   document.documentElement.classList.toggle('enhanced', immersive);
   const active = Math.max(0, stops.findLastIndex(top => top <= 1));
+  const welcome = filmMode && active === 0 && destination === null;
+  stage.classList.toggle('is-welcome', welcome);
+  scrollCue.classList.toggle('is-welcome', welcome);
+  if (driftPlaying && (!welcome || scrollY > 2)) stopDrift();
   if (destination !== null && Math.abs(stops[destination]) <= 1) destination = null;
   scrollCue.hidden = !filmMode || intro !== 'done' || destination !== null || active === chapters.length - 1;
   captions.forEach((caption, index) => {
@@ -199,8 +215,27 @@ film.addEventListener('loadeddata', () => {
 function finishIntro() {
   film.pause();
   intro = 'done';
-  seekFilm();
+  if (scrollY <= 2 && desktop.matches && !reduced.matches && film.currentTime >= introEnd) {
+    driftPlaying = true;
+    film.playbackRate = .125;
+    film.play().then(() => requestAnimationFrame(watchDrift)).catch(stopDrift);
+  } else {
+    seekFilm();
+  }
   schedule();
+}
+function stopDrift() {
+  if (!driftPlaying) return;
+  driftPlaying = false;
+  film.pause();
+  film.playbackRate = 1;
+  scrollStartTime = Math.max(introEnd, Math.min(driftEnd, film.currentTime));
+  seekFilm();
+}
+function watchDrift() {
+  if (!driftPlaying) return;
+  if (film.currentTime >= driftEnd || film.ended) stopDrift();
+  else requestAnimationFrame(watchDrift);
 }
 function watchIntro() {
   if (film.currentTime >= introEnd || !desktop.matches || reduced.matches || scrollY > 2) finishIntro();
@@ -225,6 +260,7 @@ addEventListener('wheel', event => {
   if (next === current) return;
   lastStep = now;
   destination = next;
+  stopDrift();
   chapters[next].scrollIntoView({ behavior: 'smooth', block: 'start' });
 }, { passive: false });
 film.addEventListener('seeked', seekFilm);
