@@ -67,6 +67,28 @@ button, .button { background: #faeee5; color: #18334b; padding: .6rem 1rem; bord
 .enhanced .copy { top: auto; position: fixed; left: clamp(1rem,6vw,6rem); bottom: clamp(1.25rem,7vh,5rem); max-width: calc(100% - 2rem); max-height: calc(100svh - 6rem); overflow: auto; pointer-events: auto; background: #10273bd9; }
 .enhanced .copy[hidden] { display: none; }
 .enhanced .copy h1, .enhanced .copy h2 { font-size: clamp(1.8rem,4.3vw,3.8rem); }
+html.film-mode .chapter:not(:first-child) .copy {
+  top: 50%;
+  left: 50%;
+  bottom: auto;
+  transform: translate(-50%, -50%);
+  width: max-content;
+  max-width: min(88vw, 36rem);
+  padding: clamp(.7rem, 2vw, 1.25rem) clamp(1rem, 3vw, 2rem);
+  border: 1px solid #f5faff40;
+  border-radius: 1.125rem;
+  background: rgb(24 51 75 / 58%);
+  backdrop-filter: blur(9px);
+  text-align: center;
+  color: #fff;
+}
+html.film-mode .chapter:not(:first-child) h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 4vw, 3.15rem);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+html.film-mode .chapter:last-child .button { margin: 0; }
 @media (prefers-reduced-motion: reduce) { .stage { position: relative; height: 55vh; } .chapters { margin: 0; } .chapter { min-height: auto; padding-block: 1rem; } .copy { position: static; } }
 </style>
 <script>document.documentElement.classList.add('film-starting');</script>
