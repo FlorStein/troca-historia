@@ -14,6 +14,9 @@ body { margin: 0; background: #18334b; color: #fff8ef; font: 16px/1.55 'DM Sans'
 .shot, .clouds { object-fit: cover; }
 .city { object-position: 62% top; }
 .clouds { background: #527891; }
+.desktop-film { display: none; }
+.film-mode .desktop-film { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.film-mode .clouds, .film-mode #rio, .film-mode #beach, .film-mode .air, .film-mode .room { display: none; }
 .air { position: absolute; inset: 0; overflow: hidden; pointer-events: none; perspective: 46rem; }
 .air i { position: absolute; inset: -18%; opacity: 0; background: radial-gradient(ellipse at 14% 68%,#e4eff7c9,transparent 38%),radial-gradient(ellipse at 93% 27%,#f8ece1dd,transparent 37%); }
 .scrim { background: linear-gradient(0deg,#081c2cf2,transparent 65%),linear-gradient(90deg,#081c2c70,transparent 80%); }
@@ -51,6 +54,7 @@ button, .button { background: #faeee5; color: #18334b; padding: .6rem 1rem; bord
     <img class="shot" id="beach" alt="" src="https://commons.wikimedia.org/wiki/Special:FilePath/Praia_de_Ipanema_vista_do_Arpoador.jpg?width=1600">
     <div class="air" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="room" id="room" aria-hidden="true"></div>
+    <video class="desktop-film" id="desktop-film" data-src="vuelo-troca.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
     <div class="scrim" aria-hidden="true"></div>
     <header class="head"><a href="index.html">Troca</a><button type="button" id="lang" aria-label="Português">PT</button></header>
   </div>
@@ -96,16 +100,31 @@ const captions = chapters.map(chapter => chapter.querySelector('.copy'));
 const airLayers = [...document.querySelectorAll('.air i')];
 const [ba, clouds, rio, beach, room] = ['ba', 'clouds', 'rio', 'beach', 'room'].map(id => document.getElementById(id));
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+const desktop = matchMedia('(min-width: 900px) and (pointer: fine)');
+const film = document.getElementById('desktop-film');
 const clamp = value => Math.min(1, Math.max(0, value));
 const ease = value => { const t = clamp(value); return t * t * (3 - 2 * t); };
 let frame = 0;
 let flying = false;
+let filmProgress = 0;
+let filmLoaded = false;
+
+function seekFilm() {
+  if (!desktop.matches || reduced.matches || film.seeking || !Number.isFinite(film.duration)) return;
+  const target = filmProgress * Math.max(0, film.duration - .04);
+  if (Math.abs(film.currentTime - target) > .015) film.currentTime = target;
+}
 
 function render() {
   frame = 0;
   const stops = chapters.map(chapter => chapter.getBoundingClientRect().top);
   const segment = index => clamp(-stops[index] / Math.max(1, stops[index + 1] - stops[index]));
   const immersive = !reduced.matches;
+  const useFilm = desktop.matches && immersive;
+  if (useFilm && !film.hasAttribute('src')) film.src = film.dataset.src;
+  document.documentElement.classList.toggle('film-mode', useFilm && filmLoaded && !film.error);
+  filmProgress = clamp(-stops[0] / Math.max(1, document.documentElement.scrollHeight - innerHeight));
+  seekFilm();
   document.documentElement.classList.toggle('enhanced', immersive);
   const active = Math.max(0, stops.findLastIndex(top => top <= 1));
   captions.forEach((caption, index) => {
@@ -132,7 +151,7 @@ function render() {
   beach.style.opacity = coast;
   room.style.opacity = doorway;
   room.style.transform = reduced.matches ? '' : 'scale(' + (2.65 - doorway * 1.65) + ')';
-  const shouldFly = immersive && takeoff > 0 && descent < 1;
+  const shouldFly = immersive && !document.documentElement.classList.contains('film-mode') && takeoff > 0 && descent < 1;
   if (shouldFly !== flying) {
     flying = shouldFly;
     if (flying) clouds.play().catch(() => {});
@@ -146,6 +165,13 @@ function schedule() {
 addEventListener('scroll', schedule, { passive: true });
 addEventListener('resize', schedule);
 reduced.addEventListener('change', schedule);
+desktop.addEventListener('change', schedule);
+film.addEventListener('loadeddata', () => {
+  filmLoaded = true;
+  schedule();
+});
+film.addEventListener('seeked', seekFilm);
+film.addEventListener('error', schedule);
 const language = document.getElementById('lang');
 const copy = [...document.querySelectorAll('[data-pt]')].map(node => [node, node.textContent]);
 language.addEventListener('click', () => {
