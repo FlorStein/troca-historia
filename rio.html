@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Troca · De Buenos Aires a Río</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700;800&family=Geist+Mono:wght@500;600&family=Outfit:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Geist+Mono:wght@500;600&family=Outfit:wght@700&display=swap');
 :root { color-scheme: dark; }
 * { box-sizing: border-box; }
 body { margin: 0; background: #18334b; color: #fff8ef; font: 16px/1.55 'DM Sans', sans-serif; }
@@ -103,7 +103,8 @@ html.film-mode .chapter:not(:first-child) h2 {
   text-shadow: 0 2px 18px #081c2cbf;
 }
 .film-mode .scrim { background: radial-gradient(ellipse at center, #081c2c63, transparent 58%); }
-.copy h1, .copy h2, .film-mode .chapter:first-child .copy h1 { font-family: Geist, Arial, sans-serif; font-weight: 800; }
+.copy h1, .copy h2, .film-mode .chapter:first-child .copy h1 { font-family: Anton, 'Arial Narrow', sans-serif; font-weight: 400; letter-spacing: .01em; }
+.copy h2 .line { display: block; }
 .wordmark, .head a.wordmark { font-family: Outfit, Arial, sans-serif; font-weight: 700; }
 .scroll-cue, .lang, .final-entry { font-family: 'Geist Mono', monospace; }
 html.film-mode .chapter:last-child .copy { z-index: 3; }
@@ -136,7 +137,7 @@ html.film-mode .chapter:last-child .button { margin: .85rem 0 0; pointer-events:
       <h2 data-pt="Um novo jeito de viajar">Una nueva forma de viajar</h2>
     </div></section>
     <section class="chapter"><div class="copy">
-      <h2 data-pt="Troque de casa. Mude de paisagem.">Intercambiá tu casa. Cambiá de paisaje.</h2>
+      <h2><span class="line" data-pt="Troque de casa">Intercambiá tu casa</span><span class="line" data-pt="Mude de paisagem">Cambiá de paisaje</span></h2>
     </div></section>
     <section class="chapter"><div class="copy">
       <h2 data-pt="Descubra cada lugar como quem vive lá">Descubrí cada lugar como alguien de ahí</h2>
@@ -146,7 +147,7 @@ html.film-mode .chapter:last-child .button { margin: .85rem 0 0; pointer-events:
     </div></section>
     <section class="chapter"><div class="copy">
       <h2><span data-pt="Você chegou,">Llegaste,</span> <span class="wordmark" data-pt="trocou">trocaste</span></h2>
-      <a class="button final-entry" href="https://troca.pages.dev/">ENTRAR</a>
+      <a class="button final-entry" href="https://troca-2q9.pages.dev/">ENTRAR</a>
     </div></section>
   </div>
 </main>
@@ -171,8 +172,8 @@ let manualPlayback = false;
 let flightFrame = 0;
 let flightDestination = null;
 const chapterTimes = () => desktop.matches
-  ? [3.6, 9, 14, 19, 24, Math.max(29, film.duration - 4)]
-  : [3.1, 6, 8.7, 11.5, 14, 24.9];
+  ? [3.6, 9, 14, 19, 30.1, 32.5]
+  : [3.1, 6, 8.7, 11.5, 23.4, 25.2];
 const filmChapter = () => chapterTimes().findLastIndex(time => time <= film.currentTime);
 
 function revealCaption(caption, index, active, times) {
