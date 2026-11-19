@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Troca · De Buenos Aires a Río</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&family=Fraunces:wght@600&family=Playfair+Display:wght@600..800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700;800&family=Geist+Mono:wght@500;600&family=Outfit:wght@700&display=swap');
 :root { color-scheme: dark; }
 * { box-sizing: border-box; }
 body { margin: 0; background: #18334b; color: #fff8ef; font: 16px/1.55 'DM Sans', sans-serif; }
@@ -103,7 +103,12 @@ html.film-mode .chapter:not(:first-child) h2 {
   text-shadow: 0 2px 18px #081c2cbf;
 }
 .film-mode .scrim { background: radial-gradient(ellipse at center, #081c2c63, transparent 58%); }
-html.film-mode .chapter:last-child .button { margin: 0; }
+.copy h1, .copy h2, .film-mode .chapter:first-child .copy h1 { font-family: Geist, Arial, sans-serif; font-weight: 800; }
+.wordmark, .head a.wordmark { font-family: Outfit, Arial, sans-serif; font-weight: 700; }
+.scroll-cue, .lang, .final-entry { font-family: 'Geist Mono', monospace; }
+html.film-mode .chapter:last-child .copy { z-index: 3; }
+html.film-mode .chapter:last-child .button { margin: .85rem 0 0; pointer-events: auto; animation: entry-in .65s .45s ease both; }
+@keyframes entry-in { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .stage { position: relative; height: 55vh; } .chapters { margin: 0; } .chapter { min-height: auto; padding-block: 1rem; } .copy { position: static; } }
 </style>
 <script>document.documentElement.classList.add('film-starting');</script>
@@ -120,12 +125,12 @@ html.film-mode .chapter:last-child .button { margin: 0; }
     <video class="desktop-film" id="desktop-film" data-src="vuelo-troca-pausado.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
     <div class="scrim" aria-hidden="true"></div>
     <div class="scroll-cue" id="scroll-cue" hidden><span aria-hidden="true">↑↓</span><span data-pt="Deslize para avançar ou voltar">Deslizá para avanzar o volver</span></div>
-    <header class="head"><a href="index.html">Troca</a><button type="button" id="lang" aria-label="Português">PT</button></header>
+    <header class="head"><a class="wordmark" href="index.html">Troca</a><button type="button" id="lang" aria-label="Português">PT</button></header>
     <div class="opening-veil" aria-hidden="true"></div>
   </div>
   <div class="chapters">
     <section class="chapter"><div class="copy">
-      <h1 data-pt="Conheça a Troca">Conocé Troca</h1>
+      <h1><span data-pt="Conheça a">Conocé</span> <span class="wordmark">Troca</span></h1>
     </div></section>
     <section class="chapter"><div class="copy">
       <h2 data-pt="Um novo jeito de viajar">Una nueva forma de viajar</h2>
@@ -140,10 +145,8 @@ html.film-mode .chapter:last-child .button { margin: 0; }
       <h2 data-pt="Sinta-se em casa, longe de casa">Sentite en casa, lejos de casa</h2>
     </div></section>
     <section class="chapter"><div class="copy">
-      <h2 data-pt="Boas-vindas à Troca">Bienvenido a Troca</h2>
-    </div></section>
-    <section class="chapter"><div class="copy">
-      <a class="button" href="https://troca.pages.dev/" data-pt="Entrar na Troca">Entrar a Troca</a>
+      <h2><span data-pt="Você chegou,">Llegaste,</span> <span class="wordmark" data-pt="trocou">trocaste</span></h2>
+      <a class="button final-entry" href="https://troca.pages.dev/">ENTRAR</a>
     </div></section>
   </div>
 </main>
@@ -168,8 +171,8 @@ let manualPlayback = false;
 let flightFrame = 0;
 let flightDestination = null;
 const chapterTimes = () => desktop.matches
-  ? [3.6, 9, 14, 19, 24, 29, Math.max(30, film.duration - 2)]
-  : [3.1, 6, 8.7, 11.5, 14, 20, 24.9];
+  ? [3.6, 9, 14, 19, 24, Math.max(29, film.duration - 4)]
+  : [3.1, 6, 8.7, 11.5, 14, 24.9];
 const filmChapter = () => chapterTimes().findLastIndex(time => time <= film.currentTime);
 
 function revealCaption(caption, index, active, times) {
@@ -328,7 +331,8 @@ addEventListener('wheel', event => {
 }, { passive: false });
 let touchStart;
 addEventListener('touchstart', event => {
-  touchStart = event.touches.length === 1 ? event.touches[0].clientY : undefined;
+  const interactive = event.target.closest?.('a, button');
+  touchStart = !interactive && event.touches.length === 1 ? event.touches[0].clientY : undefined;
 }, { passive: true });
 addEventListener('touchend', event => {
   if (touchStart === undefined || !filmWasActive || !event.changedTouches.length) return;
