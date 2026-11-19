@@ -5,7 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Troca · De Buenos Aires a Río</title>
 <style>
-@import url('https://api.fontshare.com/v2/css?f[]=satoshi@700,900&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400&f[]=general-sans@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400&display=swap');
+:root { --story-font: Satoshi, Arial, sans-serif; }
+:root[data-font="general-sans"] { --story-font: 'General Sans', Arial, sans-serif; }
+:root[data-font="instrument-sans"] { --story-font: 'Instrument Sans', Arial, sans-serif; }
 :root { color-scheme: dark; }
 * { box-sizing: border-box; }
 body { margin: 0; background: #18334b; color: #fff8ef; font: 16px/1.55 'DM Sans', sans-serif; }
@@ -35,8 +39,8 @@ html.film-mode { overflow: hidden; }
 .film-mode .chapter:first-child .copy { left: 50%; bottom: auto; top: 50%; transform: translate(-50%,-50%); text-align: center; border: 0; background: transparent; pointer-events: none; overflow: visible; }
 .film-mode .chapter:first-child .copy h1 { font: 750 clamp(3.25rem,9vw,9rem)/1.05 'Playfair Display', Georgia, serif; letter-spacing: -.035em; color: #fff; text-shadow: 0 2px 18px #081c2cbf; animation: title-depth 1.7s cubic-bezier(.2,.65,.3,1) both; }
 @keyframes title-depth {
-  from { opacity: 0; scale: .76; font-weight: 600; }
-  to { opacity: 1; scale: 1; font-weight: 750; }
+  from { opacity: 0; scale: .76; }
+  to { opacity: 1; scale: 1; }
 }
 @media (prefers-reduced-motion: no-preference) {
   html.film-starting .copy { visibility: hidden; }
@@ -103,16 +107,22 @@ html.film-mode .chapter:not(:first-child) h2 {
   text-shadow: 0 2px 18px #081c2cbf;
 }
 .film-mode .scrim { background: radial-gradient(ellipse at center, #081c2c63, transparent 58%); }
-.copy h1, .copy h2, .film-mode .chapter:first-child .copy h1 { font-family: Satoshi, Arial, sans-serif; font-weight: 900; letter-spacing: -.045em; }
+.copy h1, .copy h2, .film-mode .chapter:first-child .copy h1 { font-family: var(--story-font); font-weight: 400; letter-spacing: -.035em; }
 .copy h2 .line { display: block; }
 .copy .wordmark { font: inherit; letter-spacing: inherit; }
-.head a.wordmark, .scroll-cue, .lang, .final-entry { font-family: Satoshi, Arial, sans-serif; font-weight: 700; }
+.head a.wordmark, .scroll-cue, .lang, .final-entry { font-family: var(--story-font); font-weight: 400; }
 html.film-mode .chapter:last-child .copy { z-index: 3; }
 html.film-mode .chapter:last-child .button { margin: .85rem 0 0; pointer-events: auto; animation: entry-in .65s .45s ease both; }
 @keyframes entry-in { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .stage { position: relative; height: 55vh; } .chapters { margin: 0; } .chapter { min-height: auto; padding-block: 1rem; } .copy { position: static; } }
 </style>
-<script>document.documentElement.classList.add('film-starting');</script>
+<script>
+document.documentElement.classList.add('film-starting');
+const previewFont = new URLSearchParams(location.search).get('font');
+if (['general-sans', 'instrument-sans'].includes(previewFont)) {
+  document.documentElement.dataset.font = previewFont;
+}
+</script>
 </head>
 <body>
 <main>
