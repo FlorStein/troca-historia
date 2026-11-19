@@ -75,10 +75,8 @@ html.film-mode .chapter:not(:first-child) .copy {
   width: max-content;
   max-width: min(88vw, 36rem);
   padding: clamp(.7rem, 2vw, 1.25rem) clamp(1rem, 3vw, 2rem);
-  border: 1px solid #f5faff40;
-  border-radius: 1.125rem;
-  background: rgb(24 51 75 / 58%);
-  backdrop-filter: blur(9px);
+  border: 0;
+  background: transparent;
   text-align: center;
   color: #fff;
 }
@@ -87,7 +85,9 @@ html.film-mode .chapter:not(:first-child) h2 {
   font-size: clamp(1.45rem, 4vw, 3.15rem);
   line-height: 1.08;
   text-wrap: balance;
+  text-shadow: 0 2px 18px #081c2cbf;
 }
+.film-mode .scrim { background: radial-gradient(ellipse at center, #081c2c63, transparent 58%); }
 html.film-mode .chapter:last-child .button { margin: 0; }
 @media (prefers-reduced-motion: reduce) { .stage { position: relative; height: 55vh; } .chapters { margin: 0; } .chapter { min-height: auto; padding-block: 1rem; } .copy { position: static; } }
 </style>
@@ -112,16 +112,16 @@ html.film-mode .chapter:last-child .button { margin: 0; }
       <h1 data-pt="Conheça a Troca">Conocé Troca</h1>
     </div></section>
     <section class="chapter"><div class="copy">
-      <h2 data-pt="Como funciona">Cómo funciona</h2>
+      <h2 data-pt="Um novo jeito de viajar">Una nueva forma de viajar</h2>
     </div></section>
     <section class="chapter"><div class="copy">
-      <h2 data-pt="Uma noite vale um ponto">Una noche vale un punto</h2>
+      <h2 data-pt="Troque de casa. Mude de paisagem.">Intercambiá tu casa. Cambiá de paisaje.</h2>
     </div></section>
     <section class="chapter"><div class="copy">
-      <h2 data-pt="Troque com confiança">Intercambiá con confianza</h2>
+      <h2 data-pt="Descubra cada lugar como quem vive lá">Descubrí cada lugar como alguien de ahí</h2>
     </div></section>
     <section class="chapter"><div class="copy">
-      <h2 data-pt="Rio de Janeiro">Río de Janeiro</h2>
+      <h2 data-pt="Sinta-se em casa, longe de casa">Sentite en casa, lejos de casa</h2>
     </div></section>
     <section class="chapter"><div class="copy">
       <a class="button" href="https://troca.pages.dev/" data-pt="Entrar na Troca">Entrar a Troca</a>
@@ -145,6 +145,7 @@ let flying = false;
 let filmLoaded = false;
 let wheelAt = -Infinity;
 let filmWasActive = false;
+let manualPlayback = false;
 const chapterTimes = () => desktop.matches
   ? [3.6, 9, 14, 19, 24, Math.max(25, film.duration - 1.2)]
   : [3.1, 6, 8.7, 11.5, 14, 24.9];
@@ -183,7 +184,7 @@ function render() {
     filmWasActive = filmMode;
     if (filmMode) {
       window.scrollTo(0, 0);
-      film.play().catch(() => {});
+      if (!manualPlayback) film.play().catch(() => {});
     } else film.pause();
   }
   const active = filmMode ? filmChapter() : Math.max(0, stops.findLastIndex(top => top <= 1));
@@ -250,12 +251,13 @@ film.addEventListener('loadeddata', () => {
   schedule();
 });
 function stepFilm(direction) {
+  manualPlayback = true;
+  film.pause();
   const current = filmChapter();
   const next = Math.max(0, Math.min(chapters.length - 1, current + direction));
-  const time = chapterTimes()[next];
-  if (next === current && (direction > 0 || film.currentTime <= time + .05)) return;
-  film.currentTime = time + .02;
-  film.play().catch(() => {});
+  const times = chapterTimes();
+  const hold = Math.min(times[next] + .68, film.duration - .06);
+  film.currentTime = hold;
   schedule();
 }
 addEventListener('wheel', event => {
