@@ -138,6 +138,7 @@ function render() {
   seekFilm();
   document.documentElement.classList.toggle('enhanced', immersive);
   const active = Math.max(0, stops.findLastIndex(top => top <= 1));
+  if (destination !== null && Math.abs(stops[destination]) <= 1) destination = null;
   scrollCue.hidden = !filmMode || intro !== 'done' || destination !== null || active === chapters.length - 1;
   captions.forEach((caption, index) => {
     if (filmMode) {
@@ -148,7 +149,6 @@ function render() {
       caption.hidden = immersive && (index !== active || (active < 5 && segment(active) > .82));
     }
   });
-  if (destination !== null && Math.abs(stops[destination]) <= 1) destination = null;
   const takeoff = ease((segment(0) - .62) / .38);
   const descent = ease((segment(2) - .65) / .35);
   const coast = ease((segment(3) - .62) / .38);
