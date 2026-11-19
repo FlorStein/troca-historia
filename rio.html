@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Troca · De Buenos Aires a Río</title>
 <style>
-@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400&f[]=general-sans@400&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,900&f[]=general-sans@400&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400&display=swap');
 :root { --story-font: Satoshi, Arial, sans-serif; }
 :root[data-font="general-sans"] { --story-font: 'General Sans', Arial, sans-serif; }
@@ -109,6 +109,18 @@ html.film-mode .chapter:not(:first-child) h2 {
 .film-mode .scrim { background: radial-gradient(ellipse at center, #081c2c63, transparent 58%); }
 .copy h1, .copy h2, .film-mode .chapter:first-child .copy h1 { font-family: var(--story-font); font-weight: 400; letter-spacing: -.035em; }
 .copy h2 .line { display: block; }
+.film-mode .chapter:first-child .copy { width: 94vw; max-width: none; padding: 0; }
+.film-mode .chapter:first-child .copy h1 {
+  margin: 0;
+  font-size: clamp(3rem, min(16vw, 27svh), 18rem);
+  font-weight: 900;
+  line-height: .84;
+  letter-spacing: -.075em;
+  color: #142a3b;
+  text-shadow: none;
+}
+.film-mode .chapter:first-child .copy h1 span { display: block; }
+.film-mode .stage.is-welcome .scrim { opacity: 0; }
 .copy .wordmark { font: inherit; letter-spacing: inherit; }
 .head a.wordmark, .scroll-cue, .lang, .final-entry { font-family: var(--story-font); font-weight: 400; }
 html.film-mode .chapter:last-child .copy { z-index: 3; }
@@ -141,7 +153,7 @@ if (['general-sans', 'instrument-sans'].includes(previewFont)) {
   </div>
   <div class="chapters">
     <section class="chapter"><div class="copy">
-      <h1><span data-pt="Conheça a">Conocé</span> <span class="wordmark">Troca</span></h1>
+      <h1><span data-pt="DESCUBRA">DESCUBRÍ</span> <span class="wordmark">TROCA</span></h1>
     </div></section>
     <section class="chapter"><div class="copy">
       <h2 data-pt="Um novo jeito de viajar">Una nueva forma de viajar</h2>
@@ -182,8 +194,8 @@ let manualPlayback = false;
 let flightFrame = 0;
 let flightDestination = null;
 const chapterTimes = () => desktop.matches
-  ? [3.6, 9, 14, 19, 25, 33]
-  : [3.1, 6, 8.7, 11.5, 19, 25.2];
+  ? [.35, 9, 14, 19, 25, 33]
+  : [.35, 6, 8.7, 11.5, 19, 25.2];
 const filmChapter = () => chapterTimes().findLastIndex(time => time <= film.currentTime);
 
 function revealCaption(caption, index, active, times) {
