@@ -182,8 +182,8 @@ let manualPlayback = false;
 let flightFrame = 0;
 let flightDestination = null;
 const chapterTimes = () => desktop.matches
-  ? [3.6, 9, 14, 19, 30.1, 32.5]
-  : [3.1, 6, 8.7, 11.5, 23.4, 25.2];
+  ? [3.6, 9, 14, 19, 25, 33]
+  : [3.1, 6, 8.7, 11.5, 19, 25.2];
 const filmChapter = () => chapterTimes().findLastIndex(time => time <= film.currentTime);
 
 function revealCaption(caption, index, active, times) {
