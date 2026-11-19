@@ -18,12 +18,12 @@ body { margin: 0; background: #18334b; color: #fff8ef; font: 16px/1.55 'DM Sans'
 html.film-mode { overflow: hidden; }
 .film-mode .desktop-film { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #10273b; }
 .film-mode .chapter:first-child .copy { left: 50%; bottom: auto; top: 50%; transform: translate(-50%,-50%); text-align: center; border: 0; background: transparent; pointer-events: none; overflow: visible; }
-.film-mode .chapter:first-child .copy h1 { font: 750 clamp(3rem,7vw,7rem)/1.05 'Playfair Display', Georgia, serif; letter-spacing: -.035em; color: #18334b; text-shadow: 0 1px 12px #fff8efcc, 0 0 38px #fff8ef99; animation: title-depth 1.7s cubic-bezier(.2,.65,.3,1) both; }
+.film-mode .chapter:first-child .copy h1 { font: 750 clamp(3rem,7vw,7rem)/1.05 'Playfair Display', Georgia, serif; letter-spacing: -.035em; color: #18334b; animation: title-depth 1.7s cubic-bezier(.2,.65,.3,1) both; }
 @keyframes title-depth {
   from { opacity: 0; scale: .76; color: #738c9d; font-weight: 600; }
   to { opacity: 1; scale: 1; color: #18334b; font-weight: 750; }
 }
-@media (min-width: 900px) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+@media (prefers-reduced-motion: no-preference) {
   html.film-starting .copy { visibility: hidden; }
 }
 .film-mode .chapter:first-child .copy :is(small,p) { display: none; }
@@ -35,6 +35,12 @@ html.film-mode { overflow: hidden; }
 .film-mode .scroll-cue:not([hidden]) { position: absolute; z-index: 2; right: clamp(1rem,4vw,4rem); bottom: 2rem; display: flex; align-items: center; gap: .7rem; padding: .65rem 1rem; border-radius: 999px; background: #10273be8; color: #fff8ef; }
 .film-mode .scroll-cue.is-welcome { animation: welcome-in 1s .55s ease-out both; }
 .film-mode .stage.is-welcome .scrim { opacity: .35; transition: opacity 1.2s ease; }
+@media (max-width: 899px), (pointer: coarse) {
+  .film-mode .desktop-film { object-fit: cover; }
+  .film-mode .scroll-cue:not([hidden]) { bottom: 1rem; right: 1rem; font-size: .8rem; }
+  html.film-mode .copy { bottom: 4.25rem; }
+  html.film-mode .chapter:first-child .copy { bottom: auto; }
+}
 .film-mode .clouds, .film-mode #rio, .film-mode #beach, .film-mode .air, .film-mode .room { display: none; }
 .air { position: absolute; inset: 0; overflow: hidden; pointer-events: none; perspective: 46rem; }
 .air i { position: absolute; inset: -18%; opacity: 0; background: radial-gradient(ellipse at 14% 68%,#e4eff7c9,transparent 38%),radial-gradient(ellipse at 93% 27%,#f8ece1dd,transparent 37%); }
@@ -76,42 +82,27 @@ button, .button { background: #faeee5; color: #18334b; padding: .6rem 1rem; bord
     <div class="room" id="room" aria-hidden="true"></div>
     <video class="desktop-film" id="desktop-film" data-src="vuelo-troca-pausado.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
     <div class="scrim" aria-hidden="true"></div>
-    <div class="scroll-cue" id="scroll-cue" hidden><span aria-hidden="true">↑↓</span><span data-pt="Role para avançar ou voltar">Hacé scroll para avanzar o volver</span></div>
+    <div class="scroll-cue" id="scroll-cue" hidden><span aria-hidden="true">↑↓</span><span data-pt="Deslize para avançar ou voltar">Deslizá para avanzar o volver</span></div>
     <header class="head"><a href="index.html">Troca</a><button type="button" id="lang" aria-label="Português">PT</button></header>
   </div>
   <div class="chapters">
     <section class="chapter"><div class="copy">
-      <small data-pt="Buenos Aires · Argentina">Buenos Aires · Argentina</small>
-      <h1 data-pt="Conheça a Troca.">Conocé Troca.</h1>
-      <p data-pt="A Troca nasceu de uma pergunta: e se hospedar alguém na sua casa ajudasse você a conhecer outra cidade? Role para começar a viagem.">Troca nació de una pregunta: ¿y si alojar a alguien en tu casa te ayudara a conocer otra ciudad? Deslizá para empezar el viaje.</p>
+      <h1 data-pt="Conheça a Troca">Conocé Troca</h1>
     </div></section>
     <section class="chapter"><div class="copy">
-      <small data-pt="Em voo · Como funciona a troca">En vuelo · Cómo funciona el intercambio</small>
-      <h2 data-pt="Uma noite vale um ponto.">Una noche vale un punto.</h2>
-      <p data-pt="Após a estadia e a avaliação do hóspede, você ganha um ponto por noite hospedada. Cada ponto permite solicitar uma noite em outra casa. Publicar ou abrir datas não gera pontos.">Después de la estadía y la evaluación del huésped, ganás un punto por noche alojada. Cada punto te permite solicitar una noche en otra casa. Publicar o abrir fechas no suma puntos.</p>
-      <p data-pt="O plano Viajante dá três pontos uma única vez após a ativação paga, a verificação de identidade e a aprovação da casa. Os pontos vencem em um ano e são intransferíveis.">El Plan Viajero da tres puntos una sola vez, con el plan pago activo, identidad verificada y casa aprobada. Los puntos vencen al año y no se transfieren.</p>
+      <h2 data-pt="Como funciona">Cómo funciona</h2>
     </div></section>
     <section class="chapter"><div class="copy">
-      <small data-pt="Em voo · Segurança">En vuelo · Seguridad</small>
-      <h2 data-pt="Antes de cruzar a porta.">Antes de cruzar la puerta.</h2>
-      <p data-pt="Para publicar, a Troca verifica a identidade e o endereço. O endereço exato só é revelado após a confirmação. Fotos antes e depois, um depósito virtual retido durante a estadia e avaliações mútuas ajudam a documentar a troca.">Para publicar, Troca verifica identidad y domicilio. La dirección exacta se revela al confirmar. Las fotos antes y después, el depósito virtual retenido durante la estadía y las evaluaciones mutuas ayudan a documentar el intercambio.</p>
-      <p data-pt="Pagamentos, alterações e incidentes são tratados dentro da Troca.">Los pagos, cambios e incidencias se gestionan dentro de Troca.</p>
+      <h2 data-pt="Uma noite vale um ponto">Una noche vale un punto</h2>
     </div></section>
     <section class="chapter"><div class="copy">
-      <small data-pt="Descida · Rio de Janeiro">Descenso · Río de Janeiro</small>
-      <h2 data-pt="O Rio aparece pela janela.">Río aparece por la ventanilla.</h2>
-      <p data-pt="Argentina e Brasil são o ponto de partida. O plano Base oferece benefícios em hotéis parceiros sem precisar publicar uma casa. Com o Viajante você também pode fazer trocas.">Argentina y Brasil son el punto de partida. El Plan Base ofrece beneficios en hoteles aliados sin publicar una casa. Con Viajero también podés hacer intercambios.</p>
+      <h2 data-pt="Troque com confiança">Intercambiá con confianza</h2>
     </div></section>
     <section class="chapter"><div class="copy">
-      <small>Ipanema · Rio de Janeiro</small>
-      <h2 data-pt="Da costa até a casa.">De la costa a la casa.</h2>
-      <p data-pt="A viagem termina em uma casa de praia imaginada para este percurso, com o mar à vista.">El viaje termina en una casa de playa imaginada para este recorrido, con el mar a la vista.</p>
+      <h2 data-pt="Rio de Janeiro">Río de Janeiro</h2>
     </div></section>
     <section class="chapter"><div class="copy">
-      <h2 data-pt="Você chegou. Você trocou.">Llegaste, trocaste.</h2>
-      <p data-pt="Abra a janela. A praia está do outro lado.">Abrí la ventana. Del otro lado está la playa.</p>
-      <a class="button" href="index.html" data-pt="Explorar Troca">Explorar Troca</a>
-      <p class="credit"><a href="https://commons.wikimedia.org/wiki/File:Praia_de_Ipanema_vista_do_Arpoador.jpg">Ipanema · Flavinharn</a> · <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a></p>
+      <a class="button" href="https://troca.pages.dev/" data-pt="Entrar na Troca">Entrar a Troca</a>
     </div></section>
   </div>
 </main>
@@ -130,19 +121,24 @@ const ease = value => { const t = clamp(value); return t * t * (3 - 2 * t); };
 let frame = 0;
 let flying = false;
 let filmLoaded = false;
-const introEnd = 3.6;
 let wheelAt = -Infinity;
 let filmWasActive = false;
-const chapterSpan = () => Math.max(.1, (film.duration - introEnd) / chapters.length);
-const filmChapter = () => Math.min(chapters.length - 1, Math.floor((film.currentTime - introEnd) / chapterSpan()));
+const chapterTimes = () => desktop.matches
+  ? [3.6, 9, 14, 19, 24, Math.max(25, film.duration - 1.2)]
+  : [3.1, 6, 8.7, 11.5, 14, 24.9];
+const filmChapter = () => chapterTimes().findLastIndex(time => time <= film.currentTime);
 
 function render() {
   frame = 0;
   const stops = chapters.map(chapter => chapter.getBoundingClientRect().top);
   const segment = index => clamp(-stops[index] / Math.max(1, stops[index + 1] - stops[index]));
   const immersive = !reduced.matches;
-  const useFilm = desktop.matches && immersive;
-  if (useFilm && !film.hasAttribute('src')) film.src = film.dataset.src;
+  const useFilm = immersive;
+  const source = desktop.matches ? film.dataset.src : 'vuelo-troca-vertical.mp4';
+  if (useFilm && film.getAttribute('src') !== source) {
+    filmLoaded = false;
+    film.src = source;
+  }
   document.documentElement.classList.toggle('film-mode', useFilm && filmLoaded && !film.error);
   const filmMode = useFilm && filmLoaded && !film.error;
   document.documentElement.classList.toggle('film-starting', useFilm && !filmLoaded && !film.error);
@@ -216,8 +212,9 @@ film.addEventListener('loadeddata', () => {
 function stepFilm(direction) {
   const current = filmChapter();
   const next = Math.max(0, Math.min(chapters.length - 1, current + direction));
-  if (next === current && (direction > 0 || film.currentTime <= introEnd + .05)) return;
-  film.currentTime = introEnd + next * chapterSpan() + .02;
+  const time = chapterTimes()[next];
+  if (next === current && (direction > 0 || film.currentTime <= time + .05)) return;
+  film.currentTime = time + .02;
   film.play().catch(() => {});
   schedule();
 }
@@ -234,6 +231,16 @@ addEventListener('wheel', event => {
   wheelAt = now;
   if (fresh) stepFilm(Math.sign(event.deltaY));
 }, { passive: false });
+let touchStart;
+addEventListener('touchstart', event => {
+  touchStart = event.touches.length === 1 ? event.touches[0].clientY : undefined;
+}, { passive: true });
+addEventListener('touchend', event => {
+  if (touchStart === undefined || !filmWasActive || !event.changedTouches.length) return;
+  const distance = touchStart - event.changedTouches[0].clientY;
+  touchStart = undefined;
+  if (Math.abs(distance) >= 45) stepFilm(Math.sign(distance));
+}, { passive: true });
 addEventListener('keydown', event => {
   const directions = { ArrowDown: 1, PageDown: 1, ArrowUp: -1, PageUp: -1 };
   if (!filmWasActive || !directions[event.key] || event.repeat || event.defaultPrevented) return;
