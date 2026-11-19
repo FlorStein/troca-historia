@@ -165,6 +165,8 @@ let filmLoaded = false;
 let wheelAt = -Infinity;
 let filmWasActive = false;
 let manualPlayback = false;
+let flightFrame = 0;
+let flightDestination = null;
 const chapterTimes = () => desktop.matches
   ? [3.6, 9, 14, 19, 24, 29, Math.max(30, film.duration - 2)]
   : [3.1, 6, 8.7, 11.5, 14, 20, 24.9];
@@ -269,6 +271,37 @@ film.addEventListener('loadeddata', () => {
   filmLoaded = true;
   schedule();
 });
+function travelToTime(target) {
+  cancelAnimationFrame(flightFrame);
+  const start = film.currentTime;
+  const distance = target - start;
+  const duration = Math.min(2400, Math.max(800, Math.abs(distance) * 390));
+  let elapsed = 0;
+  let previous = performance.now();
+
+  function advance(now) {
+    if (!filmWasActive) {
+      flightDestination = null;
+      return;
+    }
+    const delta = Math.min(42, now - previous);
+    previous = now;
+    if (!film.seeking) {
+      elapsed += delta;
+      const progress = clamp(elapsed / duration);
+      film.currentTime = start + distance * ease(progress);
+      schedule();
+      if (progress === 1) {
+        flightDestination = null;
+        return;
+      }
+    }
+    flightFrame = requestAnimationFrame(advance);
+  }
+
+  flightFrame = requestAnimationFrame(advance);
+}
+
 function stepFilm(direction) {
   manualPlayback = true;
   film.pause();
@@ -276,8 +309,9 @@ function stepFilm(direction) {
   const next = Math.max(0, Math.min(chapters.length - 1, current + direction));
   const times = chapterTimes();
   const hold = Math.min(times[next] + .68, film.duration - .06);
-  film.currentTime = hold;
-  schedule();
+  if (flightDestination === next || (flightDestination === null && Math.abs(film.currentTime - hold) < .04)) return;
+  flightDestination = next;
+  travelToTime(hold);
 }
 addEventListener('wheel', event => {
   if (!desktop.matches || reduced.matches || !filmLoaded || film.error ||
