@@ -150,6 +150,20 @@ const chapterTimes = () => desktop.matches
   : [3.1, 6, 8.7, 11.5, 14, 24.9];
 const filmChapter = () => chapterTimes().findLastIndex(time => time <= film.currentTime);
 
+function revealCaption(caption, index, active, times) {
+  const visible = index === active;
+  caption.hidden = !visible;
+  caption.inert = !visible;
+  if (!visible) return;
+
+  const elapsed = film.currentTime - times[index];
+  const remaining = (times[index + 1] ?? Infinity) - film.currentTime;
+  const entrance = index === 0 ? 1 : ease(elapsed / .65);
+  const exit = ease(remaining / .48);
+  caption.style.opacity = Math.min(entrance, exit);
+  caption.inert = entrance < .55 || exit < .55;
+}
+
 function render() {
   frame = 0;
   const stops = chapters.map(chapter => chapter.getBoundingClientRect().top);
@@ -177,11 +191,14 @@ function render() {
   stage.classList.toggle('is-welcome', welcome);
   scrollCue.classList.toggle('is-welcome', welcome);
   scrollCue.hidden = !filmMode;
+  const times = filmMode ? chapterTimes() : null;
   captions.forEach((caption, index) => {
     if (filmMode) {
-      caption.hidden = index !== active;
+      revealCaption(caption, index, active, times);
     } else {
       caption.hidden = immersive && (index !== active || (active < 5 && segment(active) > .82));
+      caption.style.removeProperty('opacity');
+      caption.inert = false;
     }
   });
   if (filmMode) {
@@ -189,6 +206,7 @@ function render() {
       flying = false;
       clouds.pause();
     }
+    if (!film.paused && !film.ended) schedule();
     return;
   }
   const takeoff = ease((segment(0) - .62) / .38);
@@ -270,6 +288,7 @@ addEventListener('keydown', event => {
   stepFilm(directions[event.key]);
 });
 film.addEventListener('timeupdate', schedule);
+film.addEventListener('playing', schedule);
 film.addEventListener('seeked', schedule);
 film.addEventListener('error', schedule);
 const language = document.getElementById('lang');
