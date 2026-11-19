@@ -74,7 +74,7 @@ button, .button { background: #faeee5; color: #18334b; padding: .6rem 1rem; bord
     <img class="shot" id="beach" alt="" src="https://commons.wikimedia.org/wiki/Special:FilePath/Praia_de_Ipanema_vista_do_Arpoador.jpg?width=1600">
     <div class="air" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="room" id="room" aria-hidden="true"></div>
-    <video class="desktop-film" id="desktop-film" data-src="vuelo-troca-hd.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
+    <video class="desktop-film" id="desktop-film" data-src="vuelo-troca-pausado.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
     <div class="scrim" aria-hidden="true"></div>
     <div class="scroll-cue" id="scroll-cue" hidden><span aria-hidden="true">↑↓</span><span data-pt="Role para avançar ou voltar">Hacé scroll para avanzar o volver</span></div>
     <header class="head"><a href="index.html">Troca</a><button type="button" id="lang" aria-label="Português">PT</button></header>
@@ -130,7 +130,7 @@ const ease = value => { const t = clamp(value); return t * t * (3 - 2 * t); };
 let frame = 0;
 let flying = false;
 let filmLoaded = false;
-const introEnd = 1;
+const introEnd = 3.6;
 let wheelAt = -Infinity;
 let filmWasActive = false;
 const chapterSpan = () => Math.max(.1, (film.duration - introEnd) / chapters.length);
