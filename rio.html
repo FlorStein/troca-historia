@@ -141,24 +141,6 @@ html.film-mode .chapter:not(:first-child) h2 {
   html.film-mode .chapter:first-child .copy h1 { font-size: clamp(2rem, 15vw, 7rem); line-height: .9; }
   html.film-mode .scroll-cue:not([hidden]) { bottom: max(1rem, env(safe-area-inset-bottom)); }
 }
-.film-mode .chapter:first-child .copy::after {
-  content: '';
-  position: absolute;
-  inset: 18% -2% 0;
-  pointer-events: none;
-  background:
-    radial-gradient(ellipse at 17% 76%, #e5e1d8 2%, #e5e1d8ad 12%, transparent 31%),
-    radial-gradient(ellipse at 36% 88%, #d5d8d6dc 3%, #d5d8d670 17%, transparent 34%),
-    radial-gradient(ellipse at 83% 20%, #ebe6dcd9 4%, #ebe6dc80 14%, transparent 31%);
-  filter: blur(clamp(8px, 1.55vw, 26px));
-  animation: foreground-clouds 5s ease-out both;
-}
-@keyframes foreground-clouds {
-  0% { opacity: 0; transform: translate3d(-7%, 6%, 0) scale(.97); }
-  26% { opacity: .8; }
-  72% { opacity: .55; }
-  100% { opacity: .18; transform: translate3d(9%, -1%, 0) scale(1.07); }
-}
 .film-mode .stage.is-welcome .scrim { opacity: 0; }
 .copy .wordmark { font: inherit; letter-spacing: inherit; }
 .head a.wordmark, .scroll-cue, .lang, .final-entry { font-family: var(--story-font); font-weight: 400; }
