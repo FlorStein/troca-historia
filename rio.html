@@ -186,7 +186,7 @@ if (['general-sans', 'instrument-sans'].includes(previewFont)) {
     </div></section>
     <section class="chapter"><div class="copy">
       <h2><span data-pt="Você chegou,">Llegaste,</span> <span class="wordmark" data-pt="trocou">trocaste</span></h2>
-      <a class="button final-entry" href="https://troca-2q9.pages.dev/">ENTRAR</a>
+      <a class="button final-entry" href="https://troca-2q9.pages.dev/?lang=es" hreflang="es">ENTRAR</a>
     </div></section>
   </div>
 </main>
@@ -316,6 +316,7 @@ film.addEventListener('playing', schedule);
 film.addEventListener('seeked', schedule);
 film.addEventListener('error', schedule);
 const language = document.getElementById('lang');
+const entry = document.querySelector('.final-entry');
 const sound = document.getElementById('sound');
 function updateSoundLabel() {
   const portuguese = document.documentElement.lang === 'pt-BR';
@@ -336,6 +337,10 @@ const copy = [...document.querySelectorAll('[data-pt]')].map(node => [node, node
 language.addEventListener('click', () => {
   const portuguese = document.documentElement.lang === 'es';
   document.documentElement.lang = portuguese ? 'pt-BR' : 'es';
+  const destination = new URL(entry.href);
+  destination.searchParams.set('lang', portuguese ? 'pt' : 'es');
+  entry.href = destination.href;
+  entry.hreflang = document.documentElement.lang;
   language.textContent = portuguese ? 'ES' : 'PT';
   updateSoundLabel();
   language.setAttribute('aria-label', portuguese ? 'Español' : 'Português');
