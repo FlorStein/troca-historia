@@ -6,7 +6,7 @@
 <title>Troca · De Buenos Aires a Río</title>
 <style>
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,900&f[]=general-sans@400&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400&family=Outfit:wght@700&display=swap');
 :root { --story-font: Satoshi, Arial, sans-serif; }
 :root[data-font="general-sans"] { --story-font: 'General Sans', Arial, sans-serif; }
 :root[data-font="instrument-sans"] { --story-font: 'Instrument Sans', Arial, sans-serif; }
@@ -130,7 +130,8 @@ html.film-mode .chapter:not(:first-child) h2 {
 }
 .film-mode .stage.is-welcome .scrim { opacity: 0; }
 .copy .wordmark { font: inherit; letter-spacing: inherit; }
-.head a.wordmark, .lang, .final-entry { font-family: var(--story-font); font-weight: 400; }
+.head a.wordmark { font-family: Outfit, Arial, sans-serif; font-weight: 700; }
+.lang, .final-entry { font-family: var(--story-font); font-weight: 400; }
 html.film-mode .chapter:last-child .copy { z-index: 3; }
 html.film-mode .chapter:last-child .button { margin: .85rem 0 0; pointer-events: auto; animation: entry-in .65s .45s ease both; }
 @keyframes entry-in { from { opacity: 0; } to { opacity: 1; } }
