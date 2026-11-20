@@ -198,6 +198,7 @@ const [ba, clouds, rio, beach, room] = ['ba', 'clouds', 'rio', 'beach', 'room'].
 const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 const desktop = matchMedia('(min-width: 900px) and (pointer: fine)');
 const film = document.getElementById('desktop-film');
+const previousVideoQuality = new URLSearchParams(location.search).get('calidad') === 'anterior';
 const stage = document.querySelector('.stage');
 const clamp = value => Math.min(1, Math.max(0, value));
 const ease = value => { const t = clamp(value); return t * t * (3 - 2 * t); };
@@ -230,7 +231,9 @@ function render() {
   const segment = index => clamp(-stops[index] / Math.max(1, stops[index + 1] - stops[index]));
   const immersive = !reduced.matches;
   const useFilm = immersive;
-  const source = desktop.matches ? film.dataset.src : 'vuelo-troca-vertical-hq-sonido.mp4';
+  const source = previousVideoQuality
+    ? (desktop.matches ? film.dataset.src : 'vuelo-troca-vertical-hq-sonido.mp4')
+    : (desktop.matches ? 'vuelo-troca-escritorio-calidad.mp4' : 'vuelo-troca-celular-calidad.mp4');
   if (useFilm && film.getAttribute('src') !== source) {
     filmLoaded = false;
     film.src = source;
