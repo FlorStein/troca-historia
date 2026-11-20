@@ -225,7 +225,7 @@ function render() {
   const segment = index => clamp(-stops[index] / Math.max(1, stops[index + 1] - stops[index]));
   const immersive = !reduced.matches;
   const useFilm = immersive;
-  const source = desktop.matches ? film.dataset.src : 'vuelo-troca-vertical.mp4';
+  const source = desktop.matches ? film.dataset.src : 'vuelo-troca-vertical-hq.mp4';
   if (useFilm && film.getAttribute('src') !== source) {
     filmLoaded = false;
     film.src = source;
