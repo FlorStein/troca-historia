@@ -202,7 +202,7 @@ let filmLoaded = false;
 let filmWasActive = false;
 const chapterTimes = () => desktop.matches
   ? [4, 9, 14, 19, 25, 32.5]
-  : [2.8, 6, 8.7, 11.5, 19, 24.7];
+  : [2.8, 6.4, 10, 13.6, 19, 24.7];
 const filmChapter = () => chapterTimes().findLastIndex(time => time <= film.currentTime);
 
 function revealCaption(caption, index, active, times) {
@@ -213,8 +213,8 @@ function revealCaption(caption, index, active, times) {
 
   const elapsed = film.currentTime - times[index];
   const remaining = (times[index + 1] ?? Infinity) - film.currentTime;
-  const entrance = index === 0 ? 1 : ease(elapsed / .65);
-  const exit = ease(remaining / .48);
+  const entrance = index === 0 ? 1 : ease(elapsed / (desktop.matches ? .65 : .4));
+  const exit = ease(remaining / (desktop.matches ? .48 : .3));
   caption.style.opacity = Math.min(entrance, exit);
   caption.inert = entrance < .55 || exit < .55;
 }
@@ -238,7 +238,6 @@ function render() {
     filmWasActive = filmMode;
     if (filmMode) {
       window.scrollTo(0, 0);
-      film.playbackRate = desktop.matches ? 1 : .78;
       film.play().catch(() => {});
     } else film.pause();
   }
