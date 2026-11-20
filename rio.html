@@ -132,6 +132,11 @@ html.film-mode .chapter:not(:first-child) h2 {
 .copy .wordmark { font: inherit; letter-spacing: inherit; }
 .head a.wordmark { font-family: Outfit, Arial, sans-serif; font-weight: 700; }
 .lang, .final-entry { font-family: var(--story-font); font-weight: 400; }
+.head-controls { display: flex; align-items: center; gap: .5rem; }
+.head-controls button { white-space: nowrap; font-family: var(--story-font); font-size: .85rem; }
+@media (max-width: 420px) {
+  .head-controls button { padding-inline: .7rem; }
+}
 html.film-mode .chapter:last-child .copy { z-index: 3; }
 html.film-mode .chapter:last-child .button { margin: .85rem 0 0; pointer-events: auto; animation: entry-in .65s .45s ease both; }
 @keyframes entry-in { from { opacity: 0; } to { opacity: 1; } }
@@ -158,9 +163,9 @@ if (['general-sans', 'instrument-sans'].includes(previewFont)) {
     <img class="shot" id="beach" alt="" src="https://commons.wikimedia.org/wiki/Special:FilePath/Praia_de_Ipanema_vista_do_Arpoador.jpg?width=1600">
     <div class="air" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="room" id="room" aria-hidden="true"></div>
-    <video class="desktop-film" id="desktop-film" data-src="vuelo-troca-pausado.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
+    <video class="desktop-film" id="desktop-film" data-src="vuelo-troca-pausado-sonido.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
     <div class="scrim" aria-hidden="true"></div>
-    <header class="head"><a class="wordmark" href="index.html">Troca</a><button type="button" id="lang" aria-label="Português">PT</button></header>
+    <header class="head"><a class="wordmark" href="index.html">Troca</a><div class="head-controls"><button type="button" id="sound" hidden aria-pressed="false">Activar sonido</button><button type="button" id="lang" aria-label="Português">PT</button></div></header>
     <div class="opening-veil" aria-hidden="true"></div>
   </div>
   <div class="chapters">
@@ -225,13 +230,14 @@ function render() {
   const segment = index => clamp(-stops[index] / Math.max(1, stops[index + 1] - stops[index]));
   const immersive = !reduced.matches;
   const useFilm = immersive;
-  const source = desktop.matches ? film.dataset.src : 'vuelo-troca-vertical-hq.mp4';
+  const source = desktop.matches ? film.dataset.src : 'vuelo-troca-vertical-hq-sonido.mp4';
   if (useFilm && film.getAttribute('src') !== source) {
     filmLoaded = false;
     film.src = source;
   }
   document.documentElement.classList.toggle('film-mode', useFilm && filmLoaded && !film.error);
   const filmMode = useFilm && filmLoaded && !film.error;
+  sound.hidden = !filmMode;
   document.documentElement.classList.toggle('film-starting', useFilm && !filmLoaded && !film.error);
   document.documentElement.classList.toggle('enhanced', immersive);
   if (filmMode !== filmWasActive) {
@@ -307,11 +313,28 @@ film.addEventListener('playing', schedule);
 film.addEventListener('seeked', schedule);
 film.addEventListener('error', schedule);
 const language = document.getElementById('lang');
+const sound = document.getElementById('sound');
+function updateSoundLabel() {
+  const portuguese = document.documentElement.lang === 'pt-BR';
+  sound.textContent = film.muted
+    ? (portuguese ? 'Ativar som' : 'Activar sonido')
+    : 'Silenciar';
+  sound.setAttribute('aria-pressed', String(!film.muted));
+}
+sound.addEventListener('click', () => {
+  film.muted = !film.muted;
+  if (!film.muted && film.paused) {
+    if (film.ended) film.currentTime = 0;
+    film.play().catch(() => {});
+  }
+  updateSoundLabel();
+});
 const copy = [...document.querySelectorAll('[data-pt]')].map(node => [node, node.textContent]);
 language.addEventListener('click', () => {
   const portuguese = document.documentElement.lang === 'es';
   document.documentElement.lang = portuguese ? 'pt-BR' : 'es';
   language.textContent = portuguese ? 'ES' : 'PT';
+  updateSoundLabel();
   language.setAttribute('aria-label', portuguese ? 'Español' : 'Português');
   copy.forEach(([node, spanish]) => { node.textContent = portuguese ? node.dataset.pt : spanish; });
 });
